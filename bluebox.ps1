@@ -270,12 +270,12 @@ $data = [pscustomobject]@{
     Errors = $errors
   }
   Events = [pscustomobject]@{
-    Application = $appEvents
-    System = $sysEvents
-    Hardware = $hwEvents
+    Application = @($appEvents)
+    System = @($sysEvents)
+    Hardware = @($hwEvents)
   }
   Hardware = $hardware
-  InstalledApps = $apps
+  InstalledApps = @($apps)
 }
 
 $json = $data | ConvertTo-Json -Depth 6
@@ -918,6 +918,14 @@ $html = @'
   <script id="data" type="application/json">__DATA__</script>
   <script>
     const data = JSON.parse(document.getElementById('data').textContent);
+
+    const asArray = (value) => Array.isArray(value) ? value : (value ? [value] : []);
+
+    data.Events = data.Events || {};
+    data.Events.Application = asArray(data.Events.Application);
+    data.Events.System = asArray(data.Events.System);
+    data.Events.Hardware = asArray(data.Events.Hardware);
+    data.InstalledApps = asArray(data.InstalledApps);
 
     const meta = data.Meta;
     const metaLine = `Generated ${new Date(meta.GeneratedAt).toLocaleString()} on ${meta.MachineName} (${meta.UserName})`;
